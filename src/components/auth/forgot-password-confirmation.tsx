@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export default function ForgotPasswordConfirmation({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("min-h-screen bg-gray-50 flex items-center justify-center p-4 w-full", className)} {...props}>
+    <div className={cn("min-h-screen bg-card flex items-center justify-center p-4 w-full", className)} {...props}>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl text-center">Check Your Email</CardTitle>

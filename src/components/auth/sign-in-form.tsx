@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 
 export default function SignInForm({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("min-h-screen bg-gray-50 flex items-center justify-center p-4 w-full", className)} {...props}>
+    <div className={cn("min-h-screen bg-card flex items-center justify-center p-4 w-full", className)} {...props}>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl text-center">Login to your account</CardTitle>
@@ -22,7 +22,7 @@ export default function SignInForm({ className, ...props }: React.ComponentProps
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a href="#" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
+                  <a href="/auth/forgot-password" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
                     Forgot your password?
                   </a>
                 </div>

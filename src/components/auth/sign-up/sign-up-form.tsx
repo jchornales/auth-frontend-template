@@ -86,7 +86,7 @@ export default function SignUpForm() {
   const currentStepConfig = stepConfigs[currentStep];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 w-full">
+    <div className="min-h-screen bg-card flex items-center justify-center p-4 w-full">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-4">
           <div className="space-y-2">
@@ -115,12 +115,12 @@ export default function SignUpForm() {
             </Button>
 
             {currentStep < totalSteps ? (
-              <Button onClick={nextStep} disabled={!isStepValid()} className="flex items-center gap-2">
+              <Button onClick={nextStep} disabled={!isStepValid()} className="flex items-center gap-2 text-white">
                 Next
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={!isStepValid()} className="flex items-center gap-2">
+              <Button onClick={handleSubmit} disabled={!isStepValid()} className="flex items-center gap-2 text-white">
                 Submit
                 <SendHorizontal className="h-4 w-4" />
               </Button>
