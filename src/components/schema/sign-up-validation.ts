@@ -2,7 +2,7 @@ import { ValidationMessage } from "@/enums/form-validation-message";
 import z from "zod";
 import { passwordRequirements } from "./auth-validation";
 
-const userStepSchema = z
+export const userStepSchema = z
   .object({
     email: z.email(ValidationMessage.EMAIL_MUST_BE_VALID).trim(),
     password: z

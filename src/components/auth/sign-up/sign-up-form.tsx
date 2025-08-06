@@ -1,21 +1,87 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { signUpFormSchema, SignUpInput, stepsSchema } from "@/components/schema/sign-up-validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { notFound, useSearchParams } from "next/navigation";
-import React, { ComponentProps } from "react";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
+import React, { ComponentProps, useEffect, useMemo, useState } from "react";
+import { Path, useForm } from "react-hook-form";
+import UserFormStep from "./user-form-step";
+import { useSignUpStore } from "@/stores/sign-up-form-state";
+import { isEmpty } from "es-toolkit/compat";
 
 function SignUpForm({ className, ...props }: ComponentProps<"div">) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const currentStep = Number(searchParams.get("step"));
+  const step = searchParams.get("step");
+  const [currentStep, setCurrentStep] = useState(Number(step));
+  const [isNextDisabled, setIsNextDisabled] = useState(false);
+  const totalSteps = stepsSchema.length;
+  const form = useForm<SignUpInput>({
+    resolver: zodResolver(signUpFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onChange",
+  });
+  const { triggers } = useSignUpStore();
 
-  const progress = (currentStep / 4) * 100;
+  const progress = (currentStep / totalSteps) * 100;
 
-  if (isNaN(currentStep)) {
-    return notFound();
-  }
+  const onSubmit = (data: SignUpInput) => {
+    console.log(data);
+  };
+
+  const formStep = useMemo(() => {
+    switch (currentStep) {
+      case 1:
+        return <UserFormStep form={form} />;
+    }
+  }, [currentStep]);
+
+  const handleNext = async (currentStep: number) => {
+    // TODO: ConfirmPassword validation is not triggering
+    const output = await form.trigger(triggers as Path<SignUpInput>[]);
+
+    if (currentStep === totalSteps || !output) {
+      setIsNextDisabled(true);
+    }
+
+    if (currentStep <= totalSteps && output) {
+      setCurrentStep((current) => (current += 1));
+    }
+  };
+
+  const handleBack = (currentStep: number) => {
+    if (currentStep >= 1) {
+      setCurrentStep((current) => (current -= 1));
+    }
+  };
+
+  useEffect(() => {
+    if (!step) {
+      router.push("/auth/sign-up?step=1");
+    }
+
+    if (isNaN(currentStep)) {
+      notFound();
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (isEmpty(form.formState.errors)) {
+      setIsNextDisabled(false);
+    } else {
+      setIsNextDisabled(true);
+    }
+  }, [form.formState]);
 
   return (
     <div className={cn("min-h-screen bg-card flex items-center justify-center p-4 w-full", className)} {...props}>
@@ -23,7 +89,9 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
         <CardHeader className="space-y-4">
           <div className="space-y-2">
             <CardTitle className="text-2xl text-center">Create Account</CardTitle>
-            <CardDescription className="text-center">Step {currentStep} of 4</CardDescription>
+            <CardDescription className="text-center">
+              Step {currentStep} of {totalSteps}
+            </CardDescription>
           </div>
           <div className="space-y-2">
             <Progress value={progress} className="w-full" />
@@ -32,17 +100,36 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
         </CardHeader>
 
         <CardContent>
-          <div className="flex justify-between">
-            <Button variant="outline" type="button" className="flex items-center gap-2 bg-transparent">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                {formStep}
 
-            <Button className="flex items-center gap-2 text-white">
-              Next
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
+                <div className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="flex items-center gap-2 bg-transparent"
+                    disabled={currentStep <= 1}
+                    onClick={() => handleBack(currentStep)}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </Button>
+
+                  <Button
+                    disabled={isNextDisabled}
+                    type="button"
+                    onClick={() => handleNext(currentStep)}
+                    className="flex items-center gap-2 text-white"
+                  >
+                    Next
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/auth/sign-in" className="underline underline-offset-4">

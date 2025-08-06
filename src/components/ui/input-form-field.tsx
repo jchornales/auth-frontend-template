@@ -1,4 +1,5 @@
-import React, { HTMLInputTypeAttribute } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { HTMLInputTypeAttribute, useMemo } from "react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./form";
 import { Input } from "./input";
 import { FieldValues, Path, UseFormReturn } from "react-hook-form";
@@ -21,6 +22,13 @@ function InputFormField<T extends FieldValues>({
   placeholder,
   renderForgotPassword,
 }: InputGroupType<T>) {
+  const inputType = useMemo(() => {
+    if (name === "password" || name === "confirmPassword") {
+      return "password";
+    }
+    return type;
+  }, []);
+
   return (
     <FormField
       control={form.control}
@@ -36,7 +44,16 @@ function InputFormField<T extends FieldValues>({
             )}
           </div>
           <FormControl>
-            <Input id={name} type={type} placeholder={placeholder} {...field} />
+            <Input
+              id={name}
+              type={inputType}
+              placeholder={placeholder}
+              {...field}
+              onChange={(e) => {
+                field.onChange(e);
+                form.clearErrors(name);
+              }}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
