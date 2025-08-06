@@ -2,20 +2,25 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@radix-ui/react-label";
-import { Input } from "../ui/input";
-import { useState } from "react";
-import { FormData } from "@/types/form-data";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ResetPasswordInput, resetPasswordSchema } from "../schema/auth-validation";
+import InputFormField from "../ui/input-form-field";
+import { Form } from "../ui/form";
 
 export function ResetPassword({ className, ...props }: React.ComponentProps<"div">) {
-  const [formData, setFormData] = useState({
-    password: "",
-    confirmPassword: "",
+  const form = useForm<ResetPasswordInput>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      newPassword: "",
+      confirmPassword: "",
+    },
   });
 
-  const updateFormData = (field: keyof FormData, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const onSubmit = (data: ResetPasswordInput) => {
+    console.log(data);
   };
+
   return (
     <div className={cn("min-h-screen bg-card flex items-center justify-center p-4 w-full", className)} {...props}>
       <Card className="w-full max-w-md">
@@ -27,40 +32,33 @@ export function ResetPassword({ className, ...props }: React.ComponentProps<"div
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <div className="space-y-4">
+                  <InputFormField
+                    form={form}
+                    label="Password"
+                    name="newPassword"
                     type="password"
-                    value={formData.password}
-                    onChange={(e) => updateFormData("password", e.target.value)}
                     placeholder="Enter your password"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
+                  <InputFormField
+                    form={form}
+                    label="Confirm Password"
+                    name="confirmPassword"
                     type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => updateFormData("confirmPassword", e.target.value)}
                     placeholder="Confirm your password"
                   />
-                  {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                    <p className="text-sm text-red-500">Passwords do not match</p>
-                  )}
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" className="w-full">
+                    Reset Password
+                  </Button>
                 </div>
               </div>
-              <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Reset Password
-                </Button>
-              </div>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
