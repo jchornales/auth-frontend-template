@@ -30,13 +30,13 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
       birthday: new Date(),
       company: "",
       role: "",
-      terms: false,
-      newsletter: false,
     },
+    mode: "onBlur",
   });
   const { triggers } = useSignUpStore();
 
   const progress = (currentStep / totalSteps) * 100;
+  const currentFormStep = stepConfigs[currentStep - 1];
 
   const onSubmit = (data: SignUpInput) => {
     console.log(data);
@@ -44,7 +44,6 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
 
   const handleNext = async (currentStep: number) => {
     const output = await form.trigger(triggers as Path<SignUpInput>[]);
-
     if (currentStep === totalSteps || !output) {
       setIsNextDisabled(true);
     }
@@ -56,6 +55,7 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
 
   const handleBack = (currentStep: number) => {
     if (currentStep >= 1) {
+      form.clearErrors();
       setCurrentStep((current) => (current -= 1));
     }
   };
@@ -64,6 +64,7 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
     if (isEmpty(form.formState.errors)) {
       setIsNextDisabled(false);
     } else {
+      console.log(form.formState.errors);
       setIsNextDisabled(true);
     }
   }, [form.formState]);
@@ -73,14 +74,14 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-4">
           <div className="space-y-2">
-            <CardTitle className="text-2xl text-center">Create Account</CardTitle>
+            <CardTitle className="text-2xl text-center">{currentFormStep.title}</CardTitle>
             <CardDescription className="text-center">
               Step {currentStep} of {totalSteps}
             </CardDescription>
           </div>
           <div className="space-y-2">
             <Progress value={progress} className="w-full" />
-            <p className="text-xs text-muted-foreground text-center">TEST</p>
+            <p className="text-xs text-muted-foreground text-center">{currentFormStep.description}</p>
           </div>
         </CardHeader>
 
@@ -88,8 +89,9 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
-                <SignUpFormStep form={form} currentStep={currentStep} />
-
+                <div className="space-y-4">
+                  <SignUpFormStep form={form} currentStep={currentStep} />
+                </div>
                 <div className="flex justify-between">
                   <Button
                     variant="outline"
@@ -102,15 +104,19 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
                     Back
                   </Button>
 
-                  <Button
-                    disabled={isNextDisabled || currentStep === totalSteps}
-                    type="button"
-                    onClick={() => handleNext(currentStep)}
-                    className="flex items-center gap-2 text-white"
-                  >
-                    Next
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  {currentStep === totalSteps ? (
+                    <Button type="submit">Submit</Button>
+                  ) : (
+                    <Button
+                      disabled={isNextDisabled || currentStep === totalSteps}
+                      type="button"
+                      onClick={() => handleNext(currentStep)}
+                      className="flex items-center gap-2 text-white"
+                    >
+                      Next
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </form>

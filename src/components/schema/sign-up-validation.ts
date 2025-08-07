@@ -30,10 +30,6 @@ export const signUpFormSchema = z.object({
   phone: z.string().nonempty({ message: ValidationMessage.PHONE_REQUIRED }).trim().min(9),
   company: z.string().nonempty({ message: ValidationMessage.COMPANY_REQUIRED }).trim().min(5),
   role: z.string().nonempty({ message: ValidationMessage.ROLE_REQUIRED }),
-  newsletter: z.boolean(),
-  terms: z.boolean().refine((val) => val === true, {
-    message: ValidationMessage.TERMS_REQUIRED,
-  }),
 });
 
 export type SignUpInput = z.infer<typeof signUpFormSchema>;
