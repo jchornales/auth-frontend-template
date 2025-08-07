@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { signUpFormSchema, SignUpInput, stepsSchema } from "@/components/schema/sign-up-validation";
+import { signUpFormSchema, SignUpInput } from "@/components/schema/sign-up-validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
@@ -8,28 +7,32 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter, useSearchParams } from "next/navigation";
-import React, { ComponentProps, useEffect, useMemo, useState } from "react";
 import { Path, useForm } from "react-hook-form";
-import UserFormStep from "./user-form-step";
 import { useSignUpStore } from "@/stores/sign-up-form-state";
 import { isEmpty } from "es-toolkit/compat";
+import SignUpFormStep from "./sign-up-form-step";
+import { ComponentProps, useEffect, useState } from "react";
+import { stepConfigs } from "@/configs/steps";
 
 function SignUpForm({ className, ...props }: ComponentProps<"div">) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const step = searchParams.get("step");
-  const [currentStep, setCurrentStep] = useState(Number(step));
+  const [currentStep, setCurrentStep] = useState(1);
   const [isNextDisabled, setIsNextDisabled] = useState(false);
-  const totalSteps = stepsSchema.length;
+  const totalSteps = stepConfigs.length;
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: "",
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      phone: "",
+      birthday: new Date(),
+      company: "",
+      role: "",
+      terms: false,
+      newsletter: false,
     },
-    mode: "onChange",
   });
   const { triggers } = useSignUpStore();
 
@@ -39,15 +42,7 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
     console.log(data);
   };
 
-  const formStep = useMemo(() => {
-    switch (currentStep) {
-      case 1:
-        return <UserFormStep form={form} />;
-    }
-  }, [currentStep]);
-
   const handleNext = async (currentStep: number) => {
-    // TODO: ConfirmPassword validation is not triggering
     const output = await form.trigger(triggers as Path<SignUpInput>[]);
 
     if (currentStep === totalSteps || !output) {
@@ -64,16 +59,6 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
       setCurrentStep((current) => (current -= 1));
     }
   };
-
-  useEffect(() => {
-    if (!step) {
-      router.push("/auth/sign-up?step=1");
-    }
-
-    if (isNaN(currentStep)) {
-      notFound();
-    }
-  }, [currentStep]);
 
   useEffect(() => {
     if (isEmpty(form.formState.errors)) {
@@ -103,7 +88,7 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
-                {formStep}
+                <SignUpFormStep form={form} currentStep={currentStep} />
 
                 <div className="flex justify-between">
                   <Button
@@ -118,7 +103,7 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
                   </Button>
 
                   <Button
-                    disabled={isNextDisabled}
+                    disabled={isNextDisabled || currentStep === totalSteps}
                     type="button"
                     onClick={() => handleNext(currentStep)}
                     className="flex items-center gap-2 text-white"

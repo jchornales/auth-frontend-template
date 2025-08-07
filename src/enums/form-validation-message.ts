@@ -9,4 +9,13 @@ export enum ValidationMessage {
   PASSWORD_NO_SYMBOL = "Password must contain at least one symbol",
   PASSWORD_NO_UPPERCASE = "Password must contain at least one uppercase letter",
   PASSWORD_TOO_SHORT = "Password must be at least 8 characters long",
+  FIRST_NAME_REQUIRED = "First name is required",
+  LAST_NAME_REQUIRED = "Last name is required",
+  BIRTHDAY_REQUIRED = "Birthday is required",
+  EMAIL_REQUIRED = "Email is required",
+  PASSWORD_REQUIRED = "Password is required",
+  PHONE_REQUIRED = "Phone number is required",
+  COMPANY_REQUIRED = "Company is required",
+  ROLE_REQUIRED = "Role is required",
+  TERMS_REQUIRED = "You must accept the terms and conditions",
 }
