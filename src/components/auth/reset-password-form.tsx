@@ -11,10 +11,6 @@ import { Form } from "../ui/form";
 export function ResetPassword({ className, ...props }: React.ComponentProps<"div">) {
   const form = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
-    defaultValues: {
-      newPassword: "",
-      confirmPassword: "",
-    },
   });
 
   const onSubmit = (data: ResetPasswordInput) => {

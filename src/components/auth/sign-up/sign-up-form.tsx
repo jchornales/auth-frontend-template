@@ -20,17 +20,6 @@ function SignUpForm({ className, ...props }: ComponentProps<"div">) {
   const totalSteps = stepConfigs.length;
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      phone: "",
-      birthday: new Date(),
-      company: "",
-      role: "",
-    },
     mode: "onBlur",
   });
   const { triggers } = useSignUpStore();

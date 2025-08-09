@@ -11,10 +11,6 @@ import { Form } from "../ui/form";
 export default function SignInForm({ className, ...props }: React.ComponentProps<"div">) {
   const form = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
   });
 
   const onSubmit = (data: SignInInput) => {

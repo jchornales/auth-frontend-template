@@ -48,11 +48,13 @@ function InputFormField<T extends FieldValues>({
               id={name}
               type={inputType}
               placeholder={placeholder}
-              {...field}
               onChange={(e) => {
                 field.onChange(e);
                 form.clearErrors(name);
               }}
+              onBlur={field.onBlur}
+              name={field.name}
+              ref={field.ref}
             />
           </FormControl>
           <FormMessage />
